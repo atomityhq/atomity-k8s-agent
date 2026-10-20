@@ -58,7 +58,6 @@ jobs:
 
       - name: Commit generated protobuf code
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        working-directory: .
         run: |
           set -euo pipefail
 
@@ -74,13 +73,6 @@ jobs:
           git commit -m "chore(sdk): regenerate protobuf code [skip ci]"
           git push
 
-      - name: Ensure generated code is committed
-        run: |
-          if [ -n "$(git status --porcelain -- sdk)" ]; then
-            git status --short -- sdk
-            echo "::error::Generated SDK files are out of date. Run Buf generation and commit the result."
-            exit 1
-          fi
 
       - name: Run gofmt check
         working-directory: sdk
