@@ -42,12 +42,16 @@ const (
 	ControlServiceEnrollProcedure = "/atomity.agent.v1.ControlService/Enroll"
 	// ControlServiceGetTokenProcedure is the fully-qualified name of the ControlService's GetToken RPC.
 	ControlServiceGetTokenProcedure = "/atomity.agent.v1.ControlService/GetToken"
+	// ControlServiceRotateKeyProcedure is the fully-qualified name of the ControlService's RotateKey
+	// RPC.
+	ControlServiceRotateKeyProcedure = "/atomity.agent.v1.ControlService/RotateKey"
 )
 
 // ControlServiceClient is a client for the atomity.agent.v1.ControlService service.
 type ControlServiceClient interface {
 	Enroll(context.Context, *connect.Request[v1.EnrollRequest]) (*connect.Response[v1.EnrollResponse], error)
 	GetToken(context.Context, *connect.Request[v1.GetTokenRequest]) (*connect.Response[v1.GetTokenResponse], error)
+	RotateKey(context.Context, *connect.Request[v1.RotateKeyRequest]) (*connect.Response[v1.RotateKeyResponse], error)
 }
 
 // NewControlServiceClient constructs a client for the atomity.agent.v1.ControlService service. By
@@ -73,13 +77,20 @@ func NewControlServiceClient(httpClient connect.HTTPClient, baseURL string, opts
 			connect.WithSchema(controlServiceMethods.ByName("GetToken")),
 			connect.WithClientOptions(opts...),
 		),
+		rotateKey: connect.NewClient[v1.RotateKeyRequest, v1.RotateKeyResponse](
+			httpClient,
+			baseURL+ControlServiceRotateKeyProcedure,
+			connect.WithSchema(controlServiceMethods.ByName("RotateKey")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
 // controlServiceClient implements ControlServiceClient.
 type controlServiceClient struct {
-	enroll   *connect.Client[v1.EnrollRequest, v1.EnrollResponse]
-	getToken *connect.Client[v1.GetTokenRequest, v1.GetTokenResponse]
+	enroll    *connect.Client[v1.EnrollRequest, v1.EnrollResponse]
+	getToken  *connect.Client[v1.GetTokenRequest, v1.GetTokenResponse]
+	rotateKey *connect.Client[v1.RotateKeyRequest, v1.RotateKeyResponse]
 }
 
 // Enroll calls atomity.agent.v1.ControlService.Enroll.
@@ -92,10 +103,16 @@ func (c *controlServiceClient) GetToken(ctx context.Context, req *connect.Reques
 	return c.getToken.CallUnary(ctx, req)
 }
 
+// RotateKey calls atomity.agent.v1.ControlService.RotateKey.
+func (c *controlServiceClient) RotateKey(ctx context.Context, req *connect.Request[v1.RotateKeyRequest]) (*connect.Response[v1.RotateKeyResponse], error) {
+	return c.rotateKey.CallUnary(ctx, req)
+}
+
 // ControlServiceHandler is an implementation of the atomity.agent.v1.ControlService service.
 type ControlServiceHandler interface {
 	Enroll(context.Context, *connect.Request[v1.EnrollRequest]) (*connect.Response[v1.EnrollResponse], error)
 	GetToken(context.Context, *connect.Request[v1.GetTokenRequest]) (*connect.Response[v1.GetTokenResponse], error)
+	RotateKey(context.Context, *connect.Request[v1.RotateKeyRequest]) (*connect.Response[v1.RotateKeyResponse], error)
 }
 
 // NewControlServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -117,12 +134,20 @@ func NewControlServiceHandler(svc ControlServiceHandler, opts ...connect.Handler
 		connect.WithSchema(controlServiceMethods.ByName("GetToken")),
 		connect.WithHandlerOptions(opts...),
 	)
+	controlServiceRotateKeyHandler := connect.NewUnaryHandler(
+		ControlServiceRotateKeyProcedure,
+		svc.RotateKey,
+		connect.WithSchema(controlServiceMethods.ByName("RotateKey")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/atomity.agent.v1.ControlService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case ControlServiceEnrollProcedure:
 			controlServiceEnrollHandler.ServeHTTP(w, r)
 		case ControlServiceGetTokenProcedure:
 			controlServiceGetTokenHandler.ServeHTTP(w, r)
+		case ControlServiceRotateKeyProcedure:
+			controlServiceRotateKeyHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -138,4 +163,8 @@ func (UnimplementedControlServiceHandler) Enroll(context.Context, *connect.Reque
 
 func (UnimplementedControlServiceHandler) GetToken(context.Context, *connect.Request[v1.GetTokenRequest]) (*connect.Response[v1.GetTokenResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("atomity.agent.v1.ControlService.GetToken is not implemented"))
+}
+
+func (UnimplementedControlServiceHandler) RotateKey(context.Context, *connect.Request[v1.RotateKeyRequest]) (*connect.Response[v1.RotateKeyResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("atomity.agent.v1.ControlService.RotateKey is not implemented"))
 }
