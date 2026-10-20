@@ -81,12 +81,12 @@ jobs:
         run: go test -race ./...
 
       - name: Run golangci-lint
-        uses: golangci/golangci-lint-action@v6
+        uses: golangci/golangci-lint-action@v7
         with:
           version: latest
           working-directory: sdk
 
-    protobuf-breaking:
+  protobuf-breaking:
     name: Check protobuf compatibility
     runs-on: ubuntu-latest
 
@@ -102,8 +102,10 @@ jobs:
       - name: Check for breaking changes against main
         if: github.event_name == 'pull_request'
         run: |
+          set -euo pipefail
+          git fetch origin main
           buf breaking sdk/proto \
-            --against '.git#branch=main,subdir=sdk/proto'
+            --against '.git#ref=origin/main,subdir=sdk/proto'
 
       - name: Check protobuf compatibility against previous main
         if: github.event_name == 'push'
