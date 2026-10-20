@@ -14,6 +14,7 @@ option go_package = "github.com/atomityhq/atomity-k8s-agent/sdk/gen/atomity/agen
 service ControlService {
   rpc Enroll(EnrollRequest) returns (EnrollResponse);
   rpc GetToken(GetTokenRequest) returns (GetTokenResponse);
+  rpc RotateKey(RotateKeyRequest) returns (RotateKeyResponse);
 }
 
 // EnrollRequest burns the one-time enrollment credential and registers the
@@ -30,4 +31,16 @@ message GetTokenRequest {}
 message GetTokenResponse {
   string                    access_token = 1;
   google.protobuf.Timestamp expires_at   = 2;
+}
+
+// RotateKeyRequest registers a new key as "next". Not served until RotateKey
+// ships (D18) - defined now so the contract doesn't change later.
+message RotateKeyRequest {
+  // Canonical JWK JSON of the new public key, e.g.
+  // {"crv":"Ed25519","kty":"OKP","x":"<b64url>"}.
+  string new_jwk = 1;
+}
+
+message RotateKeyResponse {
+  string thumbprint = 1;
 }
