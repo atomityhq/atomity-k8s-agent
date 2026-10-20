@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+// Agent-facing control-plane RPCs: Enroll, GetToken, RotateKey. Authenticated
+// by Agent-Proof alone (no Authorization token) - see the authentication
+// spec, "Control plane operations". These message shapes are authored here
+// because no authoritative .proto source was provided alongside the spec;
+// reconcile against atomity-contracts' real definitions once published.
+package atomity.agent.v1;
+
+option go_package = "github.com/atomityhq/atomity-k8s-agent/sdk/gen/atomity/agent/v1;agentv1";
+
+service ControlService {
+  rpc Enroll(EnrollRequest) returns (EnrollResponse);
+}
+
+// EnrollRequest burns the one-time enrollment credential and registers the
+// signing key (carried in the Agent-Proof's jwk header, not in this body)
+// as the agent's current key.
+message EnrollRequest {
+  string credential = 1;
+}
+
+message EnrollResponse {}
