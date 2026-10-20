@@ -86,7 +86,7 @@ jobs:
           version: latest
           working-directory: sdk
 
-    protobuf-breaking:
+  protobuf-breaking:
     name: Check protobuf compatibility
     runs-on: ubuntu-latest
 
