@@ -7,10 +7,13 @@ syntax = "proto3";
 // reconcile against atomity-contracts' real definitions once published.
 package atomity.agent.v1;
 
+import "google/protobuf/timestamp.proto";
+
 option go_package = "github.com/atomityhq/atomity-k8s-agent/sdk/gen/atomity/agent/v1;agentv1";
 
 service ControlService {
   rpc Enroll(EnrollRequest) returns (EnrollResponse);
+  rpc GetToken(GetTokenRequest) returns (GetTokenResponse);
 }
 
 // EnrollRequest burns the one-time enrollment credential and registers the
@@ -21,3 +24,10 @@ message EnrollRequest {
 }
 
 message EnrollResponse {}
+
+message GetTokenRequest {}
+
+message GetTokenResponse {
+  string                    access_token = 1;
+  google.protobuf.Timestamp expires_at   = 2;
+}
