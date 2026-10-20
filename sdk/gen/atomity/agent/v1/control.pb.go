@@ -199,6 +199,98 @@ func (x *GetTokenResponse) GetExpiresAt() *timestamppb.Timestamp {
 	return nil
 }
 
+// RotateKeyRequest registers a new key as "next". Not served until RotateKey
+// ships (D18) - defined now so the contract doesn't change later.
+type RotateKeyRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Canonical JWK JSON of the new public key, e.g.
+	// {"crv":"Ed25519","kty":"OKP","x":"<b64url>"}.
+	NewJwk        string `protobuf:"bytes,1,opt,name=new_jwk,json=newJwk,proto3" json:"new_jwk,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RotateKeyRequest) Reset() {
+	*x = RotateKeyRequest{}
+	mi := &file_atomity_agent_v1_control_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RotateKeyRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RotateKeyRequest) ProtoMessage() {}
+
+func (x *RotateKeyRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_atomity_agent_v1_control_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RotateKeyRequest.ProtoReflect.Descriptor instead.
+func (*RotateKeyRequest) Descriptor() ([]byte, []int) {
+	return file_atomity_agent_v1_control_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *RotateKeyRequest) GetNewJwk() string {
+	if x != nil {
+		return x.NewJwk
+	}
+	return ""
+}
+
+type RotateKeyResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Thumbprint    string                 `protobuf:"bytes,1,opt,name=thumbprint,proto3" json:"thumbprint,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RotateKeyResponse) Reset() {
+	*x = RotateKeyResponse{}
+	mi := &file_atomity_agent_v1_control_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RotateKeyResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RotateKeyResponse) ProtoMessage() {}
+
+func (x *RotateKeyResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_atomity_agent_v1_control_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RotateKeyResponse.ProtoReflect.Descriptor instead.
+func (*RotateKeyResponse) Descriptor() ([]byte, []int) {
+	return file_atomity_agent_v1_control_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *RotateKeyResponse) GetThumbprint() string {
+	if x != nil {
+		return x.Thumbprint
+	}
+	return ""
+}
+
 var File_atomity_agent_v1_control_proto protoreflect.FileDescriptor
 
 const file_atomity_agent_v1_control_proto_rawDesc = "" +
@@ -213,10 +305,17 @@ const file_atomity_agent_v1_control_proto_rawDesc = "" +
 	"\x10GetTokenResponse\x12!\n" +
 	"\faccess_token\x18\x01 \x01(\tR\vaccessToken\x129\n" +
 	"\n" +
-	"expires_at\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\texpiresAt2\xb0\x01\n" +
+	"expires_at\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\texpiresAt\"+\n" +
+	"\x10RotateKeyRequest\x12\x17\n" +
+	"\anew_jwk\x18\x01 \x01(\tR\x06newJwk\"3\n" +
+	"\x11RotateKeyResponse\x12\x1e\n" +
+	"\n" +
+	"thumbprint\x18\x01 \x01(\tR\n" +
+	"thumbprint2\x86\x02\n" +
 	"\x0eControlService\x12K\n" +
 	"\x06Enroll\x12\x1f.atomity.agent.v1.EnrollRequest\x1a .atomity.agent.v1.EnrollResponse\x12Q\n" +
-	"\bGetToken\x12!.atomity.agent.v1.GetTokenRequest\x1a\".atomity.agent.v1.GetTokenResponseBIZGgithub.com/atomityhq/atomity-k8s-agent/sdk/gen/atomity/agent/v1;agentv1b\x06proto3"
+	"\bGetToken\x12!.atomity.agent.v1.GetTokenRequest\x1a\".atomity.agent.v1.GetTokenResponse\x12T\n" +
+	"\tRotateKey\x12\".atomity.agent.v1.RotateKeyRequest\x1a#.atomity.agent.v1.RotateKeyResponseBIZGgithub.com/atomityhq/atomity-k8s-agent/sdk/gen/atomity/agent/v1;agentv1b\x06proto3"
 
 var (
 	file_atomity_agent_v1_control_proto_rawDescOnce sync.Once
@@ -230,22 +329,26 @@ func file_atomity_agent_v1_control_proto_rawDescGZIP() []byte {
 	return file_atomity_agent_v1_control_proto_rawDescData
 }
 
-var file_atomity_agent_v1_control_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_atomity_agent_v1_control_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_atomity_agent_v1_control_proto_goTypes = []any{
 	(*EnrollRequest)(nil),         // 0: atomity.agent.v1.EnrollRequest
 	(*EnrollResponse)(nil),        // 1: atomity.agent.v1.EnrollResponse
 	(*GetTokenRequest)(nil),       // 2: atomity.agent.v1.GetTokenRequest
 	(*GetTokenResponse)(nil),      // 3: atomity.agent.v1.GetTokenResponse
-	(*timestamppb.Timestamp)(nil), // 4: google.protobuf.Timestamp
+	(*RotateKeyRequest)(nil),      // 4: atomity.agent.v1.RotateKeyRequest
+	(*RotateKeyResponse)(nil),     // 5: atomity.agent.v1.RotateKeyResponse
+	(*timestamppb.Timestamp)(nil), // 6: google.protobuf.Timestamp
 }
 var file_atomity_agent_v1_control_proto_depIdxs = []int32{
-	4, // 0: atomity.agent.v1.GetTokenResponse.expires_at:type_name -> google.protobuf.Timestamp
+	6, // 0: atomity.agent.v1.GetTokenResponse.expires_at:type_name -> google.protobuf.Timestamp
 	0, // 1: atomity.agent.v1.ControlService.Enroll:input_type -> atomity.agent.v1.EnrollRequest
 	2, // 2: atomity.agent.v1.ControlService.GetToken:input_type -> atomity.agent.v1.GetTokenRequest
-	1, // 3: atomity.agent.v1.ControlService.Enroll:output_type -> atomity.agent.v1.EnrollResponse
-	3, // 4: atomity.agent.v1.ControlService.GetToken:output_type -> atomity.agent.v1.GetTokenResponse
-	3, // [3:5] is the sub-list for method output_type
-	1, // [1:3] is the sub-list for method input_type
+	4, // 3: atomity.agent.v1.ControlService.RotateKey:input_type -> atomity.agent.v1.RotateKeyRequest
+	1, // 4: atomity.agent.v1.ControlService.Enroll:output_type -> atomity.agent.v1.EnrollResponse
+	3, // 5: atomity.agent.v1.ControlService.GetToken:output_type -> atomity.agent.v1.GetTokenResponse
+	5, // 6: atomity.agent.v1.ControlService.RotateKey:output_type -> atomity.agent.v1.RotateKeyResponse
+	4, // [4:7] is the sub-list for method output_type
+	1, // [1:4] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name
 	1, // [1:1] is the sub-list for extension extendee
 	0, // [0:1] is the sub-list for field type_name
@@ -262,7 +365,7 @@ func file_atomity_agent_v1_control_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_atomity_agent_v1_control_proto_rawDesc), len(file_atomity_agent_v1_control_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   4,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
