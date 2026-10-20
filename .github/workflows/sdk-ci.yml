@@ -36,12 +36,19 @@ jobs:
           go-version-file: sdk/go.mod
           cache-dependency-path: sdk/go.mod
 
+      - name: Install protobuf Go plugins
+        run: |
+          go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+          go install connectrpc.com/connect/cmd/protoc-gen-connect-go@latest
+          echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
+
       - name: Set up Buf
         uses: bufbuild/buf-setup-action@v1
 
       - name: Check protobuf lint
         working-directory: sdk/proto
         run: buf lint
+      
 
       - name: Generate protobuf
         working-directory: sdk/proto
@@ -79,10 +86,9 @@ jobs:
           version: latest
           working-directory: sdk
 
-  protobuf-breaking:
+    protobuf-breaking:
     name: Check protobuf compatibility
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
 
     steps:
       - name: Checkout
@@ -95,26 +101,23 @@ jobs:
 
       - name: Check for breaking changes against main
         if: github.event_name == 'pull_request'
-        working-directory: sdk/proto
-        run: buf breaking --against '.git#branch=main,subdir=sdk/proto'
-
-      - name: Determine previous commit
-        id: base
-        if: github.event_name == 'push'
-        run: echo "sha=${{ github.event.before }}" >> "$GITHUB_OUTPUT"
+        run: |
+          buf breaking sdk/proto \
+            --against '.git#branch=main,subdir=sdk/proto'
 
       - name: Check protobuf compatibility against previous main
         if: github.event_name == 'push'
-        working-directory: sdk/proto
         env:
-          BASE_SHA: ${{ steps.base.outputs.sha }}
+          BASE_SHA: ${{ github.event.before }}
         run: |
           set -euo pipefail
           if [ "$BASE_SHA" = "0000000000000000000000000000000000000000" ]; then
             echo "No previous commit exists; skipping compatibility check."
             exit 0
           fi
-          buf breaking --against ".git#ref=${BASE_SHA},subdir=sdk/proto"
+
+          buf breaking sdk/proto \
+            --against ".git#ref=${BASE_SHA},subdir=sdk/proto"
 
   auto-tag:
     name: Tag SDK release
